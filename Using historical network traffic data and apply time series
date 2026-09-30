@@ -1,0 +1,59 @@
+AIM: To analyze and forecast network traffic using Time Series Analysis and the ARIMA model, 
+in order to identify unusual traffic spikes and detect possible DDoS attacks.
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from statsmodels.tsa.arima.model import ARIMA
+# Create simple sample network traffic dataset
+np.random.seed(42)
+
+dates = pd.date_range(start='2026-01-01', periods=100, freq='h')
+traffic = np.random.normal(loc=120, scale=20, size=100).astype(int)
+
+# Add artificial DDoS-like spikes
+traffic[40] = 650
+traffic[70] = 720
+
+data = pd.DataFrame({
+    'timestamp': dates,
+    'traffic_volume': traffic
+})
+
+data.to_csv('network_traffic.csv', index=False)
+data.head()
+# Load dataset
+data = pd.read_csv('network_traffic.csv')
+data['timestamp'] = pd.to_datetime(data['timestamp'])
+data.set_index('timestamp', inplace=True)
+data = data.asfreq('h')
+
+data.head()
+# Plot historical network traffic
+plt.figure(figsize=(10, 5))
+plt.plot(data.index, data['traffic_volume'])
+plt.title('Historical Network Traffic')
+plt.xlabel('Time')
+plt.ylabel('Traffic Volume')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+# Train ARIMA model
+model = ARIMA(data['traffic_volume'], order=(2, 1, 2))
+model_fit = model.fit()
+# Forecast next 10 hours
+forecast_steps = 10
+forecast = model_fit.forecast(steps=forecast_steps)
+
+future_dates = pd.date_range(
+    start=data.index[-1] + pd.Timedelta(hours=1),
+    periods=forecast_steps,
+    freq='h'
+)
+
+
+forecast_df
+# Print alerts
+for _, row in forecast_df.iterrows():
+    print(row['timestamp'], '-', row['status'])
